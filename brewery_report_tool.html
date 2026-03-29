@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="啤酒廠回報">
+<title>啤酒廠倉儲回報工具</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; }
+.app { width: 100%; padding: 1rem; background: #fff; min-height: 100vh; }
+h1 { font-size: 17px; font-weight: 500; padding: 0.75rem 0 1rem; color: #1a1a1a; }
+.tabs { display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.25rem; }
+.tab { flex: 1; padding: 10px 4px; font-size: 13px; text-align: center; cursor: pointer; color: #888; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; }
+.tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.field { margin-bottom: 14px; }
+label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+input, select, textarea { width: 100%; font-size: 15px; font-family: inherit; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; -webkit-appearance: none; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #999; }
+textarea { resize: vertical; min-height: 100px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #1a1a1a; margin-bottom: 10px; }
+.btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.btn-sm { width: auto; padding: 6px 14px; font-size: 13px; margin: 0; }
+.output-box { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; color: #1a1a1a; margin-bottom: 10px; min-height: 80px; font-family: inherit; }
+.keg-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; min-height: 32px; }
+.keg-tag { background: #e8f0fe; color: #1a56db; font-size: 13px; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+.keg-tag button { background: none; border: none; cursor: pointer; color: #1a56db; font-size: 14px; padding: 0; line-height: 1; }
+.keg-row { display: flex; gap: 8px; align-items: center; }
+.keg-row input { flex: 1; }
+.scan-btn { padding: 9px 14px; font-size: 13px; white-space: nowrap; flex-shrink: 0; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; }
+.btn-copied { background: #e6f4ea; color: #2d7d46; border-color: #a8d5b5; }
+.hidden { display: none; }
+video { width: 100%; border-radius: 8px; margin-bottom: 8px; }
+.scan-area { border: 2px dashed #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 10px; text-align: center; }
+canvas { display: none; }
+.sub-field { margin-top: 10px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+.sub-field .field { margin-bottom: 10px; }
+.sub-field .field:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🍺 啤酒廠倉儲回報工具</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('receive')">領料</button>
+    <button class="tab" onclick="switchTab('return')">歸還</button>
+    <button class="tab" onclick="switchTab('instock')">入庫</button>
+    <button class="tab" onclick="switchTab('outstock')">出庫</button>
+  </div>
+
+  <!-- 領料 -->
+  <div id="tab-receive" class="section active">
+    <div class="row2">
+      <div class="field"><label>操作人員</label><input id="r-name" placeholder="姓名" /></div>
+      <div class="field"><label>日期時間</label><input id="r-date" type="datetime-local" /></div>
+    </div>
+    <div class="field"><label>品名 / 品項</label><input id="r-item" placeholder="例：原麥汁、酒花..." /></div>
+    <div class="row2">
+      <div class="field"><label>數量</label><input id="r-qty" type="number" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="r-unit" placeholder="例：kg、L、包" /></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label><input id="r-batch" placeholder="例：B2025-001" /></div>
+    <div class="field"><label>用途</label><input id="r-purpose" placeholder="例：IPA 第3批次釀造" /></div>
+    <button class="btn btn-primary" onclick="generate('receive')">產生文本</button>
+    <div id="out-receive" class="output-box hidden"></div>
+    <button id="copy-receive" class="btn hidden" onclick="copyText('receive')">複製</button>
+  </div>
+
+  <!-- 歸還 -->
+  <div id="tab-return" class="section">
+    <div class="row2">
+      <div class="field"><label>操作人員</label><input id="ret-name" placeholder="姓名" /></div>
+      <div class="field"><label>日期時間</label><input id="ret-date" type="datetime-local" /></div>
+    </div>
+    <div class="field"><label>品名 / 品項</label><input id="ret-item" placeholder="例：酒花、酵母..." /></div>
+    <div class="row2">
+      <div class="field"><label>數量</label><input id="ret-qty" type="number" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="ret-unit" placeholder="例：kg、L、包" /></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label><input id="ret-batch" placeholder="例：B2025-001" /></div>
+    <div class="field"><label>備註</label><input id="ret-note" placeholder="選填" /></div>
+    <button class="btn btn-primary" onclick="generate('return')">產生文本</button>
+    <div id="out-return" class="output-box hidden"></div>
+    <button id="copy-return" class="btn hidden" onclick="copyText('return')">複製</button>
+  </div>
+
+  <!-- 入庫 -->
+  <div id="tab-instock" class="section">
+    <div class="row2">
+      <div class="field"><label>操作人員</label><input id="in-name" placeholder="姓名" /></div>
+      <div class="field"><label>日期時間</label><input id="in-date" type="datetime-local" /></div>
+    </div>
+    <div class="field"><label>品名 / 品項</label><input id="in-item" placeholder="例：IPA" /></div>
+    <div class="row2">
+      <div class="field"><label>數量</label><input id="in-qty" type="number" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="in-unit" placeholder="例：桶、瓶、箱" /></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label><input id="in-batch" placeholder="例：B2025-001" /></div>
+
+    <div class="field">
+      <label>容器類型</label>
+      <select id="container-type" onchange="onContainerChange()">
+        <option value="none">無</option>
+        <option value="bottle">玻璃瓶</option>
+        <option value="can">鋁罐</option>
+        <option value="keg">KEG</option>
+      </select>
+
+      <!-- 玻璃瓶選項 -->
+      <div id="bottle-options" class="sub-field hidden">
+        <div class="field">
+          <label>瓶色</label>
+          <select id="bottle-color">
+            <option value="棕色">棕色</option>
+            <option value="透明">透明</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>容量</label>
+          <input id="bottle-size" type="text" value="330mL" placeholder="例：330mL" />
+        </div>
+      </div>
+
+      <!-- 鋁罐選項 -->
+      <div id="can-options" class="sub-field hidden">
+        <div class="field">
+          <label>容量</label>
+          <select id="can-size">
+            <option value="330mL">330mL</option>
+            <option value="500mL">500mL</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KEG 選項 -->
+      <div id="keg-options" class="sub-field hidden">
+        <div class="keg-row">
+          <input id="keg-input" placeholder="輸入 KEG 編號" inputmode="numeric" pattern="[0-9]*" />
+          <button class="scan-btn" onclick="addKeg()">新增</button>
+          <button class="scan-btn" onclick="toggleCamera()">📷</button>
+        </div>
+        <div id="camera-area" class="hidden" style="margin-top:8px">
+          <div class="scan-area">
+            <video id="video" autoplay playsinline></video>
+            <p style="font-size:13px;color:#666">對準 KEG 上的數字後，點擊擷取</p>
+            <button class="btn btn-sm" style="margin-top:8px" onclick="captureFrame()">擷取辨識</button>
+            <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="stopCamera()">關閉</button>
+          </div>
+          <canvas id="canvas"></canvas>
+          <p id="ocr-status" style="font-size:13px;color:#666;text-align:center;margin-bottom:8px;"></p>
+        </div>
+        <div class="keg-list" id="keg-list"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="generate('instock')">產生文本</button>
+    <div id="out-instock" class="output-box hidden"></div>
+    <button id="copy-instock" class="btn hidden" onclick="copyText('instock')">複製</button>
+  </div>
+
+  <!-- 出庫 -->
+  <div id="tab-outstock" class="section">
+    <div class="row2">
+      <div class="field"><label>操作人員</label><input id="out-name" placeholder="姓名" /></div>
+      <div class="field"><label>日期時間</label><input id="out-date" type="datetime-local" /></div>
+    </div>
+    <div class="field"><label>品名 / 品項</label><input id="out-item" placeholder="例：IPA 500mL" /></div>
+    <div class="row2">
+      <div class="field"><label>數量</label><input id="out-qty" type="number" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="out-unit" placeholder="例：桶、瓶、箱" /></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label><input id="out-batch" placeholder="例：B2025-001" /></div>
+    <div class="field"><label>出庫對象 / 用途</label><input id="out-dest" placeholder="例：門市、活動..." /></div>
+    <button class="btn btn-primary" onclick="generate('outstock')">產生文本</button>
+    <div id="out-outstock" class="output-box hidden"></div>
+    <button id="copy-outstock" class="btn hidden" onclick="copyText('outstock')">複製</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+let kegNumbers = [];
+let stream = null;
+
+function setNow(id) {
+  const el = document.getElementById(id);
+  if (el && !el.value) {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    el.value = now.toISOString().slice(0,16);
+  }
+}
+
+function switchTab(name) {
+  const names = ['receive','return','instock','outstock'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const dateMap = {receive:'r-date',return:'ret-date',instock:'in-date',outstock:'out-date'};
+  setNow(dateMap[name]);
+}
+
+function onContainerChange() {
+  const val = document.getElementById('container-type').value;
+  document.getElementById('bottle-options').classList.toggle('hidden', val !== 'bottle');
+  document.getElementById('can-options').classList.toggle('hidden', val !== 'can');
+  document.getElementById('keg-options').classList.toggle('hidden', val !== 'keg');
+}
+
+function addKeg(val) {
+  const input = document.getElementById('keg-input');
+  const v = (val || input.value).trim().replace(/[^0-9]/g,'');
+  if (!v || kegNumbers.includes(v)) { input.value=''; input.focus(); return; }
+  kegNumbers.push(v);
+  input.value = '';
+  renderKegList();
+  input.focus();
+}
+
+function removeKeg(v) {
+  kegNumbers = kegNumbers.filter(k => k !== v);
+  renderKegList();
+}
+
+function renderKegList() {
+  const el = document.getElementById('keg-list');
+  el.innerHTML = kegNumbers.map(k =>
+    `<span class="keg-tag">${k}<button onclick="removeKeg('${k}')">×</button></span>`
+  ).join('');
+}
+
+function getContainerText() {
+  const val = document.getElementById('container-type').value;
+  if (val === 'none') return null;
+  if (val === 'bottle') {
+    const color = document.getElementById('bottle-color').value;
+    const size = document.getElementById('bottle-size').value || '330mL';
+    return `玻璃瓶（${color}・${size}）`;
+  }
+  if (val === 'can') {
+    const size = document.getElementById('can-size').value;
+    return `鋁罐（${size}）`;
+  }
+  if (val === 'keg') {
+    return kegNumbers.length > 0 ? `KEG（${kegNumbers.join('、')}）` : 'KEG（未登錄編號）';
+  }
+  return null;
+}
+
+function fmtDate(val) {
+  if (!val) return '（未填）';
+  const d = new Date(val);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function g(id) { return document.getElementById(id)?.value || ''; }
+
+function generate(type) {
+  let text = '';
+  const sep = '─────────────────';
+  if (type === 'receive') {
+    text = `【領料回報】\n${sep}\n日期時間：${fmtDate(g('r-date'))}\n操作人員：${g('r-name') || '（未填）'}\n品　　名：${g('r-item') || '（未填）'}\n數　　量：${g('r-qty') || '0'} ${g('r-unit')}\n批　　號：${g('r-batch') || '（未填）'}\n用　　途：${g('r-purpose') || '（未填）'}\n${sep}`;
+  } else if (type === 'return') {
+    text = `【領量歸還回報】\n${sep}\n日期時間：${fmtDate(g('ret-date'))}\n操作人員：${g('ret-name') || '（未填）'}\n品　　名：${g('ret-item') || '（未填）'}\n歸還數量：${g('ret-qty') || '0'} ${g('ret-unit')}\n批　　號：${g('ret-batch') || '（未填）'}\n備　　註：${g('ret-note') || '無'}\n${sep}`;
+  } else if (type === 'instock') {
+    const container = getContainerText();
+    const containerLine = container ? `\n容　　器：${container}` : '';
+    text = `【入庫回報】\n${sep}\n日期時間：${fmtDate(g('in-date'))}\n操作人員：${g('in-name') || '（未填）'}\n品　　名：${g('in-item') || '（未填）'}\n入庫數量：${g('in-qty') || '0'} ${g('in-unit')}\n批　　號：${g('in-batch') || '（未填）'}${containerLine}\n${sep}`;
+  } else if (type === 'outstock') {
+    text = `【出庫回報】\n${sep}\n日期時間：${fmtDate(g('out-date'))}\n操作人員：${g('out-name') || '（未填）'}\n品　　名：${g('out-item') || '（未填）'}\n出庫數量：${g('out-qty') || '0'} ${g('out-unit')}\n批　　號：${g('out-batch') || '（未填）'}\n出庫對象：${g('out-dest') || '（未填）'}\n${sep}`;
+  }
+  const outEl = document.getElementById('out-'+type);
+  const copyEl = document.getElementById('copy-'+type);
+  outEl.textContent = text;
+  outEl.classList.remove('hidden');
+  copyEl.classList.remove('hidden');
+  copyEl.textContent = '複製';
+  copyEl.classList.remove('btn-copied');
+}
+
+function copyText(type) {
+  const text = document.getElementById('out-'+type).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-'+type);
+    btn.textContent = '已複製 ✓';
+    btn.classList.add('btn-copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('btn-copied'); }, 2000);
+  });
+}
+
+async function toggleCamera() {
+  const area = document.getElementById('camera-area');
+  if (!area.classList.contains('hidden')) { stopCamera(); return; }
+  area.classList.remove('hidden');
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    document.getElementById('video').srcObject = stream;
+  } catch(e) {
+    document.getElementById('ocr-status').textContent = '無法存取相機，請手動輸入編號';
+  }
+}
+
+function stopCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('camera-area').classList.add('hidden');
+  document.getElementById('video').srcObject = null;
+}
+
+async function captureFrame() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const status = document.getElementById('ocr-status');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  status.textContent = '辨識中...';
+  try {
+    const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
+    const nums = text.match(/\d{3,}/g);
+    if (nums && nums.length > 0) {
+      nums.forEach(n => addKeg(n));
+      status.textContent = `辨識到：${nums.join('、')}`;
+    } else {
+      status.textContent = '未辨識到數字，請重試或手動輸入';
+    }
+  } catch(e) {
+    status.textContent = '辨識失敗，請手動輸入';
+  }
+}
+
+setNow('r-date');
+</script>
+</body>
+</html>
