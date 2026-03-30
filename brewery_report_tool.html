@@ -12,43 +12,37 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; }
 .app { width: 100%; padding: 1rem; background: #fff; min-height: 100vh; }
 h1 { font-size: 17px; font-weight: 500; padding: 0.75rem 0 1rem; color: #1a1a1a; }
-.tabs { display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.25rem; overflow-x: auto; }
-.tab { flex: 1; min-width: 60px; padding: 10px 4px; font-size: 13px; text-align: center; cursor: pointer; color: #888; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; }
+.tabs { display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.25rem; }
+.tab { flex: 1; padding: 10px 4px; font-size: 13px; text-align: center; cursor: pointer; color: #888; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; }
 .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 500; }
 .section { display: none; }
 .section.active { display: block; }
-.field { margin-bottom: 14px; position: relative; }
+.field { margin-bottom: 14px; }
 label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
-input, select, textarea { width: 100%; font-size: 15px; font-family: inherit; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; -webkit-appearance: none; }
-input:focus, select:focus, textarea:focus { outline: none; border-color: #999; }
-textarea { resize: vertical; min-height: 80px; }
+input, select { width: 100%; font-size: 15px; font-family: inherit; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; -webkit-appearance: none; }
+input:focus, select:focus { outline: none; border-color: #999; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .btn { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #1a1a1a; margin-bottom: 10px; }
 .btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-.btn-danger { background: #fff; color: #c0392b; border-color: #e0b0ae; }
-.btn-sm { width: auto; padding: 6px 14px; font-size: 13px; margin: 0; }
-.btn-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.btn-row .btn { margin-bottom: 0; }
-.output-box { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; color: #1a1a1a; margin-bottom: 10px; min-height: 80px; font-family: inherit; }
+.output-box { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #1a1a1a; margin-bottom: 10px; min-height: 80px; font-family: inherit; }
 .keg-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; min-height: 28px; }
 .keg-tag { background: #e8f0fe; color: #1a56db; font-size: 13px; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
 .keg-tag button { background: none; border: none; cursor: pointer; color: #1a56db; font-size: 14px; padding: 0; line-height: 1; }
 .keg-row { display: flex; gap: 8px; align-items: center; }
 .keg-row input { flex: 1; }
-.scan-btn { padding: 9px 12px; font-size: 13px; white-space: nowrap; flex-shrink: 0; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; }
+.add-btn { padding: 9px 12px; font-size: 13px; white-space: nowrap; flex-shrink: 0; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; }
 .btn-copied { background: #e6f4ea; color: #2d7d46; border-color: #a8d5b5; }
 .hidden { display: none; }
-video { width: 100%; border-radius: 8px; margin-bottom: 8px; }
-.scan-area { border: 2px dashed #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 10px; text-align: center; }
-canvas { display: none; }
 .sub-field { margin-top: 10px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
 .sub-field .field { margin-bottom: 10px; }
 .sub-field .field:last-child { margin-bottom: 0; }
 .hint-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .hint-tag { background: #f0f0f0; color: #444; font-size: 12px; padding: 4px 10px; border-radius: 999px; cursor: pointer; border: 1px solid #e0e0e0; }
-.hint-tag:active { background: #e0e0e0; }
-.section-divider { border: none; border-top: 1px solid #f0f0f0; margin: 4px 0 14px; }
+.item-block { border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px; margin-bottom: 12px; position: relative; }
+.item-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.item-label { font-size: 13px; font-weight: 500; color: #555; }
+.remove-item-btn { font-size: 12px; color: #c0392b; background: none; border: 1px solid #e0b0ae; border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.add-item-btn { width: 100%; padding: 10px; font-size: 13px; border: 1px dashed #bbb; border-radius: 8px; background: #fafafa; color: #555; cursor: pointer; margin-bottom: 14px; }
 </style>
 </head>
 <body>
@@ -63,35 +57,17 @@ canvas { display: none; }
 
   <!-- 領料 -->
   <div id="tab-receive" class="section active">
-    <div class="btn-row">
-      <button class="btn" style="flex:1" onclick="clearForm('r')">清除</button>
-    </div>
+    <button class="btn" onclick="clearForm('r')">清除</button>
     <div class="row2">
       <div class="field"><label>操作人員</label><input id="r-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="r-date" type="datetime-local" /></div>
     </div>
-    <div class="row2">
-      <div class="field"><label>樓層</label>
-        <select id="r-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-      </div>
-      <div class="field"></div>
+    <div class="field"><label>樓層</label>
+      <select id="r-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
-    <div class="field">
-      <label>品名 / 品項</label>
-      <input id="r-item" placeholder="例：原麥汁、酒花..." />
-      <div class="hint-list" id="hint-r-item"></div>
-    </div>
-    <div class="field">
-      <label>批號 / 批次</label>
-      <input id="r-batch" placeholder="例：B2025-001" inputmode="text" autocapitalize="characters" />
-      <div class="hint-list" id="hint-r-batch"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>數量</label><input id="r-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="r-unit" placeholder="例：kg、L、包" /></div>
-    </div>
-    <div class="field">
-      <label>用途</label>
+    <div id="r-items-container"></div>
+    <button class="add-item-btn" onclick="addItem('r')">＋ 新增品項</button>
+    <div class="field"><label>用途</label>
       <input id="r-purpose" placeholder="例：IPA 第3批次釀造" />
       <div class="hint-list" id="hint-r-purpose"></div>
     </div>
@@ -102,33 +78,16 @@ canvas { display: none; }
 
   <!-- 歸還 -->
   <div id="tab-return" class="section">
-    <div class="btn-row">
-      <button class="btn" style="flex:1" onclick="clearForm('ret')">清除</button>
-    </div>
+    <button class="btn" onclick="clearForm('ret')">清除</button>
     <div class="row2">
       <div class="field"><label>操作人員</label><input id="ret-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="ret-date" type="datetime-local" /></div>
     </div>
-    <div class="row2">
-      <div class="field"><label>樓層</label>
-        <select id="ret-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-      </div>
-      <div class="field"></div>
+    <div class="field"><label>樓層</label>
+      <select id="ret-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
-    <div class="field">
-      <label>品名 / 品項</label>
-      <input id="ret-item" placeholder="例：酒花、酵母..." />
-      <div class="hint-list" id="hint-ret-item"></div>
-    </div>
-    <div class="field">
-      <label>批號 / 批次</label>
-      <input id="ret-batch" placeholder="例：B2025-001" inputmode="text" autocapitalize="characters" />
-      <div class="hint-list" id="hint-ret-batch"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>歸還數量</label><input id="ret-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="ret-unit" placeholder="例：kg、L、包" /></div>
-    </div>
+    <div id="ret-items-container"></div>
+    <button class="add-item-btn" onclick="addItem('ret')">＋ 新增品項</button>
     <div class="field"><label>備註</label><input id="ret-note" placeholder="選填" /></div>
     <button class="btn btn-primary" onclick="generate('return')">產生文本</button>
     <div id="out-return" class="output-box hidden"></div>
@@ -137,39 +96,29 @@ canvas { display: none; }
 
   <!-- 入庫 -->
   <div id="tab-instock" class="section">
-    <div class="btn-row">
-      <button class="btn" style="flex:1" onclick="clearForm('in')">清除</button>
-    </div>
+    <button class="btn" onclick="clearForm('in')">清除</button>
     <div class="row2">
       <div class="field"><label>操作人員</label><input id="in-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="in-date" type="datetime-local" /></div>
     </div>
-    <div class="row2">
-      <div class="field"><label>樓層</label>
-        <select id="in-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-      </div>
-      <div class="field"></div>
+    <div class="field"><label>樓層</label>
+      <select id="in-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
-    <div class="field">
-      <label>品名 / 品項</label>
+    <div class="field"><label>品名 / 品項</label>
       <input id="in-item" placeholder="例：IPA" />
       <div class="hint-list" id="hint-in-item"></div>
     </div>
-    <div class="field">
-      <label>批號 / 批次</label>
-      <input id="in-batch" placeholder="例：B2025-001" inputmode="text" autocapitalize="characters" />
+    <div class="field"><label>批號 / 批次</label>
+      <input id="in-batch" placeholder="例：B2025-001" inputmode="url" autocomplete="off" />
       <div class="hint-list" id="hint-in-batch"></div>
     </div>
     <div class="row2">
       <div class="field"><label>數量</label><input id="in-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="in-unit" placeholder="例：桶、瓶、箱" /></div>
+      <div class="field"><label>單位</label><input id="in-unit" placeholder="例：箱、瓶" /></div>
     </div>
-
-    <div class="field">
-      <label>未滿箱</label>
+    <div class="field"><label>未滿箱</label>
       <select id="partial-type" onchange="onPartialChange()">
-        <option value="none">無</option>
-        <option value="yes">有</option>
+        <option value="none">無</option><option value="yes">有</option>
       </select>
       <div id="partial-options" class="sub-field hidden">
         <div class="row2">
@@ -178,20 +127,15 @@ canvas { display: none; }
         </div>
       </div>
     </div>
-
-    <div class="field">
-      <label>容器類型</label>
+    <div class="field"><label>容器類型</label>
       <select id="container-type" onchange="onContainerChange()">
-        <option value="none">無</option>
-        <option value="bottle">玻璃瓶</option>
-        <option value="can">鋁罐</option>
-        <option value="keg">KEG</option>
+        <option value="none">無</option><option value="bottle">玻璃瓶</option><option value="can">鋁罐</option><option value="keg">KEG</option>
       </select>
       <div id="bottle-options" class="sub-field hidden">
         <div class="field"><label>瓶色</label>
           <select id="bottle-color"><option value="棕色">棕色</option><option value="透明">透明</option></select>
         </div>
-        <div class="field"><label>容量</label><input id="bottle-size" type="text" value="330mL" placeholder="例：330mL" /></div>
+        <div class="field"><label>容量</label><input id="bottle-size" type="text" value="330mL" /></div>
       </div>
       <div id="can-options" class="sub-field hidden">
         <div class="field"><label>容量</label>
@@ -201,23 +145,11 @@ canvas { display: none; }
       <div id="keg-options" class="sub-field hidden">
         <div class="keg-row">
           <input id="keg-input" placeholder="輸入 KEG 編號" inputmode="numeric" pattern="[0-9]*" />
-          <button class="scan-btn" onclick="addKeg()">新增</button>
-          <button class="scan-btn" onclick="toggleCamera()">📷</button>
-        </div>
-        <div id="camera-area" class="hidden" style="margin-top:8px">
-          <div class="scan-area">
-            <video id="video" autoplay playsinline></video>
-            <p style="font-size:13px;color:#666">對準 KEG 上的數字後，點擊擷取</p>
-            <button class="btn btn-sm" style="margin-top:8px" onclick="captureFrame()">擷取辨識</button>
-            <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="stopCamera()">關閉</button>
-          </div>
-          <canvas id="canvas"></canvas>
-          <p id="ocr-status" style="font-size:13px;color:#666;text-align:center;margin-bottom:8px;"></p>
+          <button class="add-btn" onclick="addKeg()">新增</button>
         </div>
         <div class="keg-list" id="keg-list"></div>
       </div>
     </div>
-
     <button class="btn btn-primary" onclick="generate('instock')">產生文本</button>
     <div id="out-instock" class="output-box hidden"></div>
     <button id="copy-instock" class="btn hidden" onclick="copyText('instock')">複製</button>
@@ -225,35 +157,17 @@ canvas { display: none; }
 
   <!-- 出庫 -->
   <div id="tab-outstock" class="section">
-    <div class="btn-row">
-      <button class="btn" style="flex:1" onclick="clearForm('out')">清除</button>
-    </div>
+    <button class="btn" onclick="clearForm('out')">清除</button>
     <div class="row2">
       <div class="field"><label>操作人員</label><input id="out-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="out-date" type="datetime-local" /></div>
     </div>
-    <div class="row2">
-      <div class="field"><label>樓層</label>
-        <select id="out-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-      </div>
-      <div class="field"></div>
+    <div class="field"><label>樓層</label>
+      <select id="out-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
-    <div class="field">
-      <label>品名 / 品項</label>
-      <input id="out-item" placeholder="例：IPA 500mL" />
-      <div class="hint-list" id="hint-out-item"></div>
-    </div>
-    <div class="field">
-      <label>批號 / 批次</label>
-      <input id="out-batch" placeholder="例：B2025-001" inputmode="text" autocapitalize="characters" />
-      <div class="hint-list" id="hint-out-batch"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>數量</label><input id="out-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="out-unit" placeholder="例：桶、瓶、箱" /></div>
-    </div>
-    <div class="field">
-      <label>出庫對象 / 用途</label>
+    <div id="out-items-container"></div>
+    <button class="add-item-btn" onclick="addItem('out')">＋ 新增品項</button>
+    <div class="field"><label>出庫對象 / 用途</label>
       <input id="out-dest" placeholder="例：門市、活動..." />
       <div class="hint-list" id="hint-out-dest"></div>
     </div>
@@ -263,198 +177,211 @@ canvas { display: none; }
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-let kegNumbers = [];
-let stream = null;
-
-// ── Storage helpers ──
+// ── Storage ──
 function ls(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
 
-// ── Operator name memory ──
-function saveName(v) {
-  if (v.trim()) lsSet('operator', v.trim());
-}
+// ── Name ──
+function saveName(v) { if (v.trim()) lsSet('operator', v.trim()); }
 function loadName() {
-  const n = ls('operator');
-  if (!n) return;
-  ['r-name','ret-name','in-name','out-name'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && !el.value) el.value = n;
-  });
+  const n = ls('operator'); if (!n) return;
+  ['r-name','ret-name','in-name','out-name'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = n; });
 }
 
-// ── Now time ──
+// ── Time ──
 function nowStr() {
   const now = new Date();
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   return now.toISOString().slice(0,16);
 }
-function setNow(id) {
-  const el = document.getElementById(id);
-  if (el) el.value = nowStr();
-}
+function setNow(id) { const el = document.getElementById(id); if (el) el.value = nowStr(); }
 
-// ── Hints (history) ──
-const HINT_FIELDS = {
-  'r': ['item','batch','purpose'],
-  'ret': ['item','batch'],
-  'in': ['item','batch'],
-  'out': ['item','batch','dest']
-};
-
+// ── Hints ──
 function hintKey(prefix, field) { return `hist_${prefix}_${field}`; }
-
 function addHint(prefix, field, val) {
   if (!val || !val.trim()) return;
   const key = hintKey(prefix, field);
   let arr = ls(key) || [];
   arr = arr.filter(x => x !== val.trim());
   arr.unshift(val.trim());
-  arr = arr.slice(0, 3);
-  lsSet(key, arr);
+  lsSet(key, arr.slice(0, 3));
 }
-
-function renderHints(prefix, field) {
-  const el = document.getElementById(`hint-${prefix}-${field}`);
-  if (!el) return;
+function renderHints(elId, prefix, field) {
+  const el = document.getElementById(elId); if (!el) return;
   const arr = ls(hintKey(prefix, field)) || [];
-  el.innerHTML = arr.map(v =>
-    `<span class="hint-tag" onclick="fillHint('${prefix}-${field}','${v.replace(/'/g,"\\'")}')">　${v}　</span>`
-  ).join('');
+  el.innerHTML = arr.map(v => `<span class="hint-tag" onclick="fillHint('${elId.replace('hint-','')}','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
 }
-
-function fillHint(id, val) {
-  const el = document.getElementById(id);
-  if (el) { el.value = val; el.focus(); }
-}
-
+function fillHint(id, val) { const el = document.getElementById(id); if (el) { el.value = val; } }
 function renderAllHints() {
-  Object.entries(HINT_FIELDS).forEach(([prefix, fields]) => {
-    fields.forEach(f => renderHints(prefix, f));
-  });
+  renderHints('hint-r-purpose','r','purpose');
+  renderHints('hint-ret-note','ret','note');
+  renderHints('hint-in-item','in','item');
+  renderHints('hint-in-batch','in','batch');
+  renderHints('hint-out-dest','out','dest');
 }
 
-function saveFormHints(prefix) {
-  const fields = HINT_FIELDS[prefix] || [];
-  fields.forEach(f => {
-    const el = document.getElementById(`${prefix}-${f}`);
-    if (el && el.value.trim()) addHint(prefix, f, el.value.trim());
-  });
+// ── Multi-item blocks ──
+const itemCounters = { r: 0, ret: 0, out: 0 };
+
+function addItem(prefix) {
+  itemCounters[prefix]++;
+  const idx = itemCounters[prefix];
+  const container = document.getElementById(`${prefix}-items-container`);
+  const hintFields = { r: ['item','batch'], ret: ['item','batch'], out: ['item','batch'] };
+  const qtyLabel = prefix === 'ret' ? '歸還數量' : '數量';
+
+  const block = document.createElement('div');
+  block.className = 'item-block';
+  block.id = `${prefix}-item-${idx}`;
+  block.innerHTML = `
+    <div class="item-block-header">
+      <span class="item-label">品項 ${idx}</span>
+      ${idx > 1 ? `<button class="remove-item-btn" onclick="removeItem('${prefix}',${idx})">移除</button>` : ''}
+    </div>
+    <div class="field"><label>品名 / 品項</label>
+      <input id="${prefix}-item-${idx}-name" placeholder="例：原麥汁、酒花..." />
+      <div class="hint-list" id="hint-${prefix}-item-${idx}-name"></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label>
+      <input id="${prefix}-item-${idx}-batch" placeholder="例：B2025-001" inputmode="url" autocomplete="off" />
+      <div class="hint-list" id="hint-${prefix}-item-${idx}-batch"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>${qtyLabel}</label><input id="${prefix}-item-${idx}-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="${prefix}-item-${idx}-unit" placeholder="例：kg、L、包" /></div>
+    </div>`;
+  container.appendChild(block);
+
+  // render hints for new block
+  // Share item/batch hints between receive and return
+  const itemHintPrefix = (prefix === 'ret') ? 'r' : prefix;
+  const hintArr = (ls(hintKey(itemHintPrefix,'item')) || []);
+  const batchArr = (ls(hintKey(itemHintPrefix,'batch')) || []);
+  const nameEl = document.getElementById(`hint-${prefix}-item-${idx}-name`);
+  const batchEl = document.getElementById(`hint-${prefix}-item-${idx}-batch`);
+  if (nameEl) nameEl.innerHTML = hintArr.map(v => `<span class="hint-tag" onclick="fillHint('${prefix}-item-${idx}-name','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
+  if (batchEl) batchEl.innerHTML = batchArr.map(v => `<span class="hint-tag" onclick="fillHint('${prefix}-item-${idx}-batch','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
 }
 
-// ── Clear form ──
-function clearForm(prefix) {
-  const name = ls('operator') || '';
-  const dateMap = { r:'r-date', ret:'ret-date', in:'in-date', out:'out-date' };
-  const skipIds = [`${prefix}-name`];
-  const dateId = dateMap[prefix];
+function removeItem(prefix, idx) {
+  const el = document.getElementById(`${prefix}-item-${idx}`);
+  if (el) el.remove();
+}
 
-  // clear all inputs/selects in the section tab
-  const tabMap = { r:'tab-receive', ret:'tab-return', in:'tab-instock', out:'tab-outstock' };
-  const tab = document.getElementById(tabMap[prefix]);
-  if (!tab) return;
-
-  tab.querySelectorAll('input, select').forEach(el => {
-    if (skipIds.includes(el.id)) return;
-    if (el.id === dateId) { el.value = nowStr(); return; }
-    if (el.tagName === 'SELECT') { el.selectedIndex = 0; return; }
-    el.value = '';
+function getItems(prefix) {
+  const container = document.getElementById(`${prefix}-items-container`);
+  const blocks = container.querySelectorAll('.item-block');
+  const results = [];
+  blocks.forEach(block => {
+    const id = block.id;
+    const idx = id.split('-').pop();
+    const name = document.getElementById(`${prefix}-item-${idx}-name`)?.value.trim() || '';
+    const batch = document.getElementById(`${prefix}-item-${idx}-batch`)?.value.trim() || '';
+    const qty = document.getElementById(`${prefix}-item-${idx}-qty`)?.value.trim() || '';
+    const unit = document.getElementById(`${prefix}-item-${idx}-unit`)?.value.trim() || '';
+    if (name || batch || qty) results.push({ name, batch, qty, unit });
+    // save hints
+    if (name) { addHint(prefix, 'item', name); if (prefix === 'r') addHint('ret', 'item', name); if (prefix === 'ret') addHint('r', 'item', name); }
+    if (batch) { addHint(prefix, 'batch', batch); if (prefix === 'r') addHint('ret', 'batch', batch); if (prefix === 'ret') addHint('r', 'batch', batch); }
   });
-
-  // reset container/partial sub-panels
-  if (prefix === 'in') {
-    ['bottle-options','can-options','keg-options','partial-options'].forEach(id => {
-      document.getElementById(id)?.classList.add('hidden');
-    });
-    kegNumbers = [];
-    renderKegList();
-  }
-
-  // hide output
-  document.getElementById(`out-${prefix === 'r' ? 'receive' : prefix === 'ret' ? 'return' : prefix === 'in' ? 'instock' : 'outstock'}`)?.classList.add('hidden');
-  const copyMap = { r:'copy-receive', ret:'copy-return', in:'copy-instock', out:'copy-outstock' };
-  document.getElementById(copyMap[prefix])?.classList.add('hidden');
+  return results;
 }
 
 // ── Tab switch ──
 function switchTab(name) {
   const names = ['receive','return','instock','outstock'];
-  const prefixes = ['r','ret','in','out'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   const dateMap = { receive:'r-date', return:'ret-date', instock:'in-date', outstock:'out-date' };
   setNow(dateMap[name]);
   renderAllHints();
-
-  // auto-fill return from last receive
   if (name === 'return') prefillReturn();
 }
 
-// ── Pre-fill return from last receive ──
 function prefillReturn() {
-  const fields = ['item','qty','unit','batch'];
-  const srcMap = { item:'r-item', qty:'r-qty', unit:'r-unit', batch:'r-batch' };
-  const dstMap = { item:'ret-item', qty:'ret-qty', unit:'ret-unit', batch:'ret-batch' };
-  fields.forEach(f => {
-    const src = document.getElementById(srcMap[f]);
-    const dst = document.getElementById(dstMap[f]);
-    if (src && dst && src.value && !dst.value) dst.value = src.value;
-  });
-  // also copy floor
+  // copy first item from receive to return if return is empty
+  const src = document.getElementById('r-item-1-name');
+  const dst = document.getElementById('ret-item-1-name');
+  if (src && dst && src.value && !dst.value) {
+    dst.value = src.value;
+    const sb = document.getElementById('r-item-1-batch');
+    const db = document.getElementById('ret-item-1-batch');
+    if (sb && db) db.value = sb.value;
+    const sq = document.getElementById('r-item-1-qty');
+    const dq = document.getElementById('ret-item-1-qty');
+    if (sq && dq) dq.value = sq.value;
+    const su = document.getElementById('r-item-1-unit');
+    const du = document.getElementById('ret-item-1-unit');
+    if (su && du) du.value = su.value;
+  }
   const sf = document.getElementById('r-floor');
   const df = document.getElementById('ret-floor');
   if (sf && df && sf.value && !df.value) df.value = sf.value;
 }
 
-// ── Container ──
+// ── Container / Partial ──
 function onContainerChange() {
   const val = document.getElementById('container-type').value;
   document.getElementById('bottle-options').classList.toggle('hidden', val !== 'bottle');
   document.getElementById('can-options').classList.toggle('hidden', val !== 'can');
   document.getElementById('keg-options').classList.toggle('hidden', val !== 'keg');
 }
-
 function onPartialChange() {
-  const val = document.getElementById('partial-type').value;
-  document.getElementById('partial-options').classList.toggle('hidden', val !== 'yes');
+  document.getElementById('partial-options').classList.toggle('hidden', document.getElementById('partial-type').value !== 'yes');
 }
 
 // ── KEG ──
-function addKeg(val) {
+let kegNumbers = [];
+function addKeg() {
   const input = document.getElementById('keg-input');
-  const v = (val || input.value).trim().replace(/[^0-9]/g,'');
+  const v = input.value.trim().replace(/[^0-9]/g,'');
   if (!v || kegNumbers.includes(v)) { input.value=''; input.focus(); return; }
   kegNumbers.push(v);
   input.value = '';
   renderKegList();
   input.focus();
 }
-function removeKeg(v) {
-  kegNumbers = kegNumbers.filter(k => k !== v);
-  renderKegList();
-}
+function removeKeg(v) { kegNumbers = kegNumbers.filter(k => k !== v); renderKegList(); }
 function renderKegList() {
-  const el = document.getElementById('keg-list');
-  if (!el) return;
-  el.innerHTML = kegNumbers.map(k =>
-    `<span class="keg-tag">${k}<button onclick="removeKeg('${k}')">×</button></span>`
-  ).join('');
+  const el = document.getElementById('keg-list'); if (!el) return;
+  el.innerHTML = kegNumbers.map(k => `<span class="keg-tag">${k}<button onclick="removeKeg('${k}')">×</button></span>`).join('');
 }
-
 function getContainerText() {
   const val = document.getElementById('container-type').value;
   if (val === 'none') return null;
-  if (val === 'bottle') {
-    const color = document.getElementById('bottle-color').value;
-    const size = document.getElementById('bottle-size').value || '330mL';
-    return `玻璃瓶（${color}・${size}）`;
-  }
+  if (val === 'bottle') return `玻璃瓶（${document.getElementById('bottle-color').value}・${document.getElementById('bottle-size').value||'330mL'}）`;
   if (val === 'can') return `鋁罐（${document.getElementById('can-size').value}）`;
   if (val === 'keg') return kegNumbers.length > 0 ? `KEG（${kegNumbers.join('、')}）` : 'KEG（未登錄編號）';
   return null;
+}
+
+// ── Clear ──
+function clearForm(prefix) {
+  const tabMap = { r:'tab-receive', ret:'tab-return', in:'tab-instock', out:'tab-outstock' };
+  const dateMap = { r:'r-date', ret:'ret-date', in:'in-date', out:'out-date' };
+  const tab = document.getElementById(tabMap[prefix]); if (!tab) return;
+  tab.querySelectorAll('input, select').forEach(el => {
+    if (el.id === `${prefix}-name`) return;
+    if (el.id === dateMap[prefix]) { el.value = nowStr(); return; }
+    if (el.tagName === 'SELECT') { el.selectedIndex = 0; return; }
+    el.value = '';
+  });
+  // reset multi-items
+  const multiPrefixes = ['r','ret','out'];
+  if (multiPrefixes.includes(prefix)) {
+    const c = document.getElementById(`${prefix}-items-container`);
+    if (c) { c.innerHTML = ''; itemCounters[prefix] = 0; addItem(prefix); }
+  }
+  if (prefix === 'in') {
+    ['bottle-options','can-options','keg-options','partial-options'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    kegNumbers = []; renderKegList();
+  }
+  const outKey = { r:'out-receive', ret:'out-return', in:'out-instock', out:'out-outstock' };
+  const copyKey = { r:'copy-receive', ret:'copy-return', in:'copy-instock', out:'copy-outstock' };
+  document.getElementById(outKey[prefix])?.classList.add('hidden');
+  document.getElementById(copyKey[prefix])?.classList.add('hidden');
 }
 
 // ── Helpers ──
@@ -463,39 +390,96 @@ function fmtDate(val) {
   const d = new Date(val);
   return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-function g(id) { return document.getElementById(id)?.value || ''; }
+function g(id) { return (document.getElementById(id)?.value || '').trim(); }
+function line(label, val) { return val ? `\n${label}${val}` : ''; }
+function compactText(t) { return t.replace(/\n{2,}/g, '\n'); }
 
 // ── Generate ──
 function generate(type) {
-  const sep = '─────────────────';
+  const sep = '─────────────';
   let text = '';
-  const prefixMap = { receive:'r', return:'ret', instock:'in', outstock:'out' };
-  const prefix = prefixMap[type];
-  saveFormHints(prefix);
-
-  const floorLine = (id) => {
-    const v = g(id);
-    return v ? `\n樓　　層：${v}` : '';
-  };
 
   if (type === 'receive') {
-    text = `【領料回報】\n${sep}\n日期時間：${fmtDate(g('r-date'))}\n操作人員：${g('r-name')||'（未填）'}${floorLine('r-floor')}\n品　　名：${g('r-item')||'（未填）'}\n數　　量：${g('r-qty')||'0'} ${g('r-unit')}\n批　　號：${g('r-batch')||'（未填）'}\n用　　途：${g('r-purpose')||'（未填）'}\n${sep}`;
+    addHint('r','purpose', g('r-purpose'));
+    const items = getItems('r');
+    const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
+      items.map((it, i) => {
+        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
+        return prefix +
+          line('\n品　　名：', it.name) +
+          line('\n批　　號：', it.batch) +
+          (it.qty ? `\n數　　量：${it.qty} ${it.unit}` : '');
+      }).join('');
+    text = `【領料回報】\n${sep}` +
+      `\n日期時間：${fmtDate(g('r-date'))}` +
+      line('\n操作人員：', g('r-name')) +
+      line('\n樓　　層：', g('r-floor')) +
+      itemsText +
+      line('\n用　　途：', g('r-purpose')) +
+      `\n${sep}`;
+
   } else if (type === 'return') {
-    text = `【領量歸還回報】\n${sep}\n日期時間：${fmtDate(g('ret-date'))}\n操作人員：${g('ret-name')||'（未填）'}${floorLine('ret-floor')}\n品　　名：${g('ret-item')||'（未填）'}\n歸還數量：${g('ret-qty')||'0'} ${g('ret-unit')}\n批　　號：${g('ret-batch')||'（未填）'}\n備　　註：${g('ret-note')||'無'}\n${sep}`;
+    const items = getItems('ret');
+    const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
+      items.map((it, i) => {
+        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
+        return prefix +
+          line('\n品　　名：', it.name) +
+          line('\n批　　號：', it.batch) +
+          (it.qty ? `\n歸還數量：${it.qty} ${it.unit}` : '');
+      }).join('');
+    text = `【領量歸還回報】\n${sep}` +
+      `\n日期時間：${fmtDate(g('ret-date'))}` +
+      line('\n操作人員：', g('ret-name')) +
+      line('\n樓　　層：', g('ret-floor')) +
+      itemsText +
+      line('\n備　　註：', g('ret-note')) +
+      `\n${sep}`;
+
   } else if (type === 'instock') {
+    addHint('in','item', g('in-item'));
+    addHint('in','batch', g('in-batch'));
     const container = getContainerText();
-    const containerLine = container ? `\n容　　器：${container}` : '';
     const partial = document.getElementById('partial-type').value === 'yes';
-    const partialLine = partial ? `\n未滿箱：${g('partial-qty')||'0'} ${g('partial-unit')}` : '';
-    text = `【入庫回報】\n${sep}\n日期時間：${fmtDate(g('in-date'))}\n操作人員：${g('in-name')||'（未填）'}${floorLine('in-floor')}\n品　　名：${g('in-item')||'（未填）'}\n入庫數量：${g('in-qty')||'0'} ${g('in-unit')}\n批　　號：${g('in-batch')||'（未填）'}${containerLine}${partialLine}\n${sep}`;
+    const partialQty = g('partial-qty');
+    const partialUnit = g('partial-unit');
+    const qty = g('in-qty');
+    text = `【入庫回報】\n${sep}` +
+      `\n日期時間：${fmtDate(g('in-date'))}` +
+      line('\n操作人員：', g('in-name')) +
+      line('\n樓　　層：', g('in-floor')) +
+      line('\n品　　名：', g('in-item')) +
+      line('\n批　　號：', g('in-batch')) +
+      (qty ? `\n入庫數量：${qty} ${g('in-unit')}` : '') +
+      (partial && partialQty ? `\n未　滿　箱：${partialQty} ${partialUnit}` : '') +
+      (container ? `\n容　　器：${container}` : '') +
+      `\n${sep}`;
+
   } else if (type === 'outstock') {
-    text = `【出庫回報】\n${sep}\n日期時間：${fmtDate(g('out-date'))}\n操作人員：${g('out-name')||'（未填）'}${floorLine('out-floor')}\n品　　名：${g('out-item')||'（未填）'}\n出庫數量：${g('out-qty')||'0'} ${g('out-unit')}\n批　　號：${g('out-batch')||'（未填）'}\n出庫對象：${g('out-dest')||'（未填）'}\n${sep}`;
+    addHint('out','dest', g('out-dest'));
+    const items = getItems('out');
+    const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
+      items.map((it, i) => {
+        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
+        return prefix +
+          line('\n品　　名：', it.name) +
+          line('\n批　　號：', it.batch) +
+          (it.qty ? `\n出庫數量：${it.qty} ${it.unit}` : '');
+      }).join('');
+    text = `【出庫回報】\n${sep}` +
+      `\n日期時間：${fmtDate(g('out-date'))}` +
+      line('\n操作人員：', g('out-name')) +
+      line('\n樓　　層：', g('out-floor')) +
+      itemsText +
+      line('\n出庫對象：', g('out-dest')) +
+      `\n${sep}`;
   }
 
   const outKey = { receive:'out-receive', return:'out-return', instock:'out-instock', outstock:'out-outstock' };
   const copyKey = { receive:'copy-receive', return:'copy-return', instock:'copy-instock', outstock:'copy-outstock' };
   const outEl = document.getElementById(outKey[type]);
   const copyEl = document.getElementById(copyKey[type]);
+  text = compactText(text);
   outEl.textContent = text;
   outEl.classList.remove('hidden');
   copyEl.classList.remove('hidden');
@@ -507,8 +491,7 @@ function generate(type) {
 function copyText(type) {
   const keyMap = { receive:'out-receive', return:'out-return', instock:'out-instock', outstock:'out-outstock' };
   const copyMap = { receive:'copy-receive', return:'copy-return', instock:'copy-instock', outstock:'copy-outstock' };
-  const text = document.getElementById(keyMap[type]).textContent;
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(document.getElementById(keyMap[type]).textContent).then(() => {
     const btn = document.getElementById(copyMap[type]);
     btn.textContent = '已複製 ✓';
     btn.classList.add('btn-copied');
@@ -516,48 +499,12 @@ function copyText(type) {
   });
 }
 
-// ── Camera ──
-async function toggleCamera() {
-  const area = document.getElementById('camera-area');
-  if (!area.classList.contains('hidden')) { stopCamera(); return; }
-  area.classList.remove('hidden');
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    document.getElementById('video').srcObject = stream;
-  } catch(e) {
-    document.getElementById('ocr-status').textContent = '無法存取相機，請手動輸入';
-  }
-}
-function stopCamera() {
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-  document.getElementById('camera-area').classList.add('hidden');
-  document.getElementById('video').srcObject = null;
-}
-async function captureFrame() {
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const status = document.getElementById('ocr-status');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  status.textContent = '辨識中...';
-  try {
-    const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
-    const nums = text.match(/\d{3,}/g);
-    if (nums && nums.length > 0) {
-      nums.forEach(n => addKeg(n));
-      status.textContent = `辨識到：${nums.join('、')}`;
-    } else {
-      status.textContent = '未辨識到數字，請重試或手動輸入';
-    }
-  } catch(e) {
-    status.textContent = '辨識失敗，請手動輸入';
-  }
-}
-
 // ── Init ──
 setNow('r-date');
 loadName();
+addItem('r');
+addItem('ret');
+addItem('out');
 renderAllHints();
 </script>
 </body>
