@@ -43,6 +43,7 @@ input:focus, select:focus { outline: none; border-color: #999; }
 .item-label { font-size: 13px; font-weight: 500; color: #555; }
 .remove-item-btn { font-size: 12px; color: #c0392b; background: none; border: 1px solid #e0b0ae; border-radius: 6px; padding: 3px 10px; cursor: pointer; }
 .add-item-btn { width: 100%; padding: 10px; font-size: 13px; border: 1px dashed #bbb; border-radius: 8px; background: #fafafa; color: #555; cursor: pointer; margin-bottom: 14px; }
+.err { border-color: #c0392b !important; background: #fff5f5 !important; }
 </style>
 </head>
 <body>
@@ -104,52 +105,8 @@ input:focus, select:focus { outline: none; border-color: #999; }
     <div class="field"><label>樓層</label>
       <select id="in-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
-    <div class="field"><label>品名 / 品項</label>
-      <input id="in-item" placeholder="例：IPA" />
-      <div class="hint-list" id="hint-in-item"></div>
-    </div>
-    <div class="field"><label>批號 / 批次</label>
-      <input id="in-batch" placeholder="例：B2025-001" inputmode="url" autocomplete="off" />
-      <div class="hint-list" id="hint-in-batch"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>數量</label><input id="in-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="in-unit" placeholder="例：箱、瓶" /></div>
-    </div>
-    <div class="field"><label>未滿箱</label>
-      <select id="partial-type" onchange="onPartialChange()">
-        <option value="none">無</option><option value="yes">有</option>
-      </select>
-      <div id="partial-options" class="sub-field hidden">
-        <div class="row2">
-          <div class="field"><label>數量</label><input id="partial-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-          <div class="field"><label>單位</label><input id="partial-unit" placeholder="例：瓶、罐" /></div>
-        </div>
-      </div>
-    </div>
-    <div class="field"><label>容器類型</label>
-      <select id="container-type" onchange="onContainerChange()">
-        <option value="none">無</option><option value="bottle">玻璃瓶</option><option value="can">鋁罐</option><option value="keg">KEG</option>
-      </select>
-      <div id="bottle-options" class="sub-field hidden">
-        <div class="field"><label>瓶色</label>
-          <select id="bottle-color"><option value="棕色">棕色</option><option value="透明">透明</option></select>
-        </div>
-        <div class="field"><label>容量</label><input id="bottle-size" type="text" value="330mL" /></div>
-      </div>
-      <div id="can-options" class="sub-field hidden">
-        <div class="field"><label>容量</label>
-          <select id="can-size"><option value="330mL">330mL</option><option value="500mL">500mL</option></select>
-        </div>
-      </div>
-      <div id="keg-options" class="sub-field hidden">
-        <div class="keg-row">
-          <input id="keg-input" placeholder="輸入 KEG 編號" inputmode="numeric" pattern="[0-9]*" />
-          <button class="add-btn" onclick="addKeg()">新增</button>
-        </div>
-        <div class="keg-list" id="keg-list"></div>
-      </div>
-    </div>
+    <div id="in-items-container"></div>
+    <button class="add-item-btn" onclick="addInItem()">＋ 新增品項</button>
     <button class="btn btn-primary" onclick="generate('instock')">產生文本</button>
     <div id="out-instock" class="output-box hidden"></div>
     <button id="copy-instock" class="btn hidden" onclick="copyText('instock')">複製</button>
@@ -222,7 +179,7 @@ function renderAllHints() {
 }
 
 // ── Multi-item blocks ──
-const itemCounters = { r: 0, ret: 0, out: 0 };
+const itemCounters = { r: 0, ret: 0, out: 0, in: 0 };
 
 function addItem(prefix) {
   itemCounters[prefix]++;
@@ -321,40 +278,228 @@ function prefillReturn() {
   if (sf && df && sf.value && !df.value) df.value = sf.value;
 }
 
-// ── Container / Partial ──
-function onContainerChange() {
-  const val = document.getElementById('container-type').value;
-  document.getElementById('bottle-options').classList.toggle('hidden', val !== 'bottle');
-  document.getElementById('can-options').classList.toggle('hidden', val !== 'can');
-  document.getElementById('keg-options').classList.toggle('hidden', val !== 'keg');
-}
-function onPartialChange() {
-  document.getElementById('partial-options').classList.toggle('hidden', document.getElementById('partial-type').value !== 'yes');
+// ── 入庫 multi-item ──
+const kegMap = {};
+
+function inShow(id, on) { document.getElementById(id)?.classList.toggle('hidden', !on); }
+
+function setInHints(p) {
+  [['name','item'],['batch','batch']].forEach(([f, key]) => {
+    const el = document.getElementById(`hint-${p}-${f}`); if (!el) return;
+    const arr = ls(hintKey('in', key)) || [];
+    el.innerHTML = arr.map(v => `<span class="hint-tag" onclick="fillHint('${p}-${f}','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
+  });
 }
 
-// ── KEG ──
-let kegNumbers = [];
-function addKeg() {
-  const input = document.getElementById('keg-input');
+function addInItem() {
+  itemCounters.in++;
+  const idx = itemCounters.in;
+  kegMap[idx] = [];
+  const p = `in-item-${idx}`;
+  const block = document.createElement('div');
+  block.className = 'item-block';
+  block.id = p;
+  block.innerHTML = `
+    <div class="item-block-header">
+      <span class="item-label">品項 ${idx}</span>
+      ${idx > 1 ? `<button class="remove-item-btn" onclick="removeInItem(${idx})">移除</button>` : ''}
+    </div>
+    <div class="field"><label>品名 / 品項</label>
+      <input id="${p}-name" placeholder="例：IPA" />
+      <div class="hint-list" id="hint-${p}-name"></div>
+    </div>
+    <div class="field"><label>批號 / 批次</label>
+      <input id="${p}-batch" placeholder="例：B2025-001" inputmode="url" autocomplete="off" />
+      <div class="hint-list" id="hint-${p}-batch"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>數量</label><input id="${p}-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+      <div class="field"><label>單位</label><input id="${p}-unit" placeholder="例：箱、瓶" /></div>
+    </div>
+    <div class="field"><label>未滿箱</label>
+      <select id="${p}-partial" onchange="inToggle(${idx})"><option value="none">無</option><option value="yes">有</option></select>
+      <div id="${p}-partial-opts" class="sub-field hidden">
+        <div class="row2">
+          <div class="field"><label>數量</label><input id="${p}-partial-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+          <div class="field"><label>單位</label><input id="${p}-partial-unit" placeholder="例：瓶、罐" /></div>
+        </div>
+      </div>
+    </div>
+    <div class="field"><label>容器類型</label>
+      <select id="${p}-container" onchange="inToggle(${idx})">
+        <option value="none">無</option><option value="bottle">玻璃瓶</option><option value="can">鋁罐</option><option value="keg">KEG</option>
+      </select>
+      <div id="${p}-bottle-opts" class="sub-field hidden">
+        <div class="field"><label>瓶色</label>
+          <select id="${p}-bottle-color"><option value="棕色">棕色</option><option value="透明">透明</option></select>
+        </div>
+        <div class="field"><label>容量</label><input id="${p}-bottle-size" type="text" value="330mL" /></div>
+      </div>
+      <div id="${p}-can-opts" class="sub-field hidden">
+        <div class="field"><label>容量</label>
+          <select id="${p}-can-size"><option value="330mL">330mL</option><option value="500mL">500mL</option></select>
+        </div>
+      </div>
+      <div id="${p}-keg-opts" class="sub-field hidden">
+        <div class="row2">
+          <div class="field"><label>KEG 類型</label>
+            <select id="${p}-keg-type" onchange="inToggle(${idx})">
+              <option value="">請選擇</option><option value="啤酒頭">啤酒頭</option><option value="啤酒肚">啤酒肚</option><option value="太空桶">太空桶</option>
+            </select>
+          </div>
+          <div class="field"><label>容量</label>
+            <select id="${p}-keg-size">
+              <option value="">請選擇</option><option value="10L">10L</option><option value="20L">20L</option><option value="30L">30L</option>
+            </select>
+          </div>
+        </div>
+        <div id="${p}-keg-nums" class="hidden">
+          <div class="keg-row">
+            <input id="${p}-keg-input" placeholder="輸入 KEG 編號" inputmode="numeric" pattern="[0-9]*" />
+            <button class="add-btn" onclick="addKegTo(${idx})">新增</button>
+          </div>
+          <div class="keg-list" id="${p}-keg-list"></div>
+          <div id="${p}-keg-count" style="font-size:12px;color:#666">已輸入 0 個編號</div>
+        </div>
+      </div>
+    </div>
+    <div class="field" id="${p}-defect-wrap"><label>瑕疵 / NG / 破損（必選）</label>
+      <select id="${p}-defect" onchange="inToggle(${idx})">
+        <option value="">請選擇</option><option value="無">無</option><option value="有">有</option>
+      </select>
+      <div id="${p}-defect-opts" class="sub-field hidden">
+        <div class="row2">
+          <div class="field"><label>種類</label>
+            <select id="${p}-defect-type"><option value="鋁罐">鋁罐</option><option value="玻璃瓶">玻璃瓶</option><option value="太空桶">太空桶</option></select>
+          </div>
+          <div class="field"><label>數量</label><input id="${p}-defect-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('in-items-container').appendChild(block);
+  setInHints(p);
+}
+
+function inToggle(idx) {
+  const p = `in-item-${idx}`;
+  const val = id => document.getElementById(`${p}-${id}`)?.value;
+  const c = val('container');
+  const kt = val('keg-type');
+  const kegNeedsNums = c === 'keg' && (kt === '啤酒頭' || kt === '啤酒肚');
+  inShow(`${p}-partial-opts`, val('partial') === 'yes');
+  inShow(`${p}-bottle-opts`, c === 'bottle');
+  inShow(`${p}-can-opts`, c === 'can');
+  inShow(`${p}-keg-opts`, c === 'keg');
+  inShow(`${p}-keg-nums`, kegNeedsNums);
+  // 啤酒頭 / 啤酒肚 免選瑕疵；其他情況（含太空桶）必選
+  inShow(`${p}-defect-wrap`, !kegNeedsNums);
+  const d = document.getElementById(`${p}-defect`);
+  if (kegNeedsNums && d) d.value = '';
+  d?.classList.remove('err');
+  inShow(`${p}-defect-opts`, !kegNeedsNums && val('defect') === '有');
+  // 容器 / KEG 類型改變時，瑕疵種類自動預選
+  const block = document.getElementById(p);
+  const sig = c + '|' + kt;
+  if (block && block.dataset.sig !== sig) {
+    block.dataset.sig = sig;
+    const dt = document.getElementById(`${p}-defect-type`);
+    if (dt && c === 'bottle') dt.value = '玻璃瓶';
+    if (dt && c === 'can') dt.value = '鋁罐';
+    if (dt && c === 'keg' && kt === '太空桶') dt.value = '太空桶';
+  }
+}
+
+function removeInItem(idx) {
+  document.getElementById(`in-item-${idx}`)?.remove();
+  delete kegMap[idx];
+}
+
+function addKegTo(idx) {
+  const input = document.getElementById(`in-item-${idx}-keg-input`);
   const v = input.value.trim().replace(/[^0-9]/g,'');
-  if (!v || kegNumbers.includes(v)) { input.value=''; input.focus(); return; }
-  kegNumbers.push(v);
+  if (v && !kegMap[idx].includes(v)) kegMap[idx].push(v);
   input.value = '';
-  renderKegList();
+  renderKeg(idx);
   input.focus();
 }
-function removeKeg(v) { kegNumbers = kegNumbers.filter(k => k !== v); renderKegList(); }
-function renderKegList() {
-  const el = document.getElementById('keg-list'); if (!el) return;
-  el.innerHTML = kegNumbers.map(k => `<span class="keg-tag">${k}<button onclick="removeKeg('${k}')">×</button></span>`).join('');
+function removeKegFrom(idx, v) { kegMap[idx] = kegMap[idx].filter(k => k !== v); renderKeg(idx); }
+function renderKeg(idx) {
+  const el = document.getElementById(`in-item-${idx}-keg-list`); if (!el) return;
+  el.innerHTML = kegMap[idx].map(k => `<span class="keg-tag">${k}<button onclick="removeKegFrom(${idx},'${k}')">×</button></span>`).join('');
+  const cnt = document.getElementById(`in-item-${idx}-keg-count`);
+  if (cnt) cnt.textContent = `已輸入 ${kegMap[idx].length} 個編號`;
 }
-function getContainerText() {
-  const val = document.getElementById('container-type').value;
-  if (val === 'none') return null;
-  if (val === 'bottle') return `玻璃瓶（${document.getElementById('bottle-color').value}・${document.getElementById('bottle-size').value||'330mL'}）`;
-  if (val === 'can') return `鋁罐（${document.getElementById('can-size').value}）`;
-  if (val === 'keg') return kegNumbers.length > 0 ? `KEG（${kegNumbers.join('、')}）` : 'KEG（未登錄編號）';
-  return null;
+
+// 讀取入庫品項：瑕疵／KEG 類型沒選會擋下（回傳 null）；KEG 編號數與數量不一致會提醒
+const DEFECT_UNIT = { '鋁罐': '罐', '玻璃瓶': '瓶', '太空桶': '桶' };
+function getInItems() {
+  const blocks = document.querySelectorAll('#in-items-container .item-block');
+  const results = [];
+  const warns = [];
+  let bad = null;
+  blocks.forEach((block, i) => {
+    if (bad) return;
+    const idx = block.id.split('-').pop();
+    const p = `in-item-${idx}`;
+    const el = id => document.getElementById(`${p}-${id}`);
+    const v = id => (el(id)?.value || '').trim();
+    const label = blocks.length > 1 ? `品項${i+1}的` : '';
+    const tag = blocks.length > 1 ? `品項${i+1}：` : '';
+    const c = v('container');
+    const kt = v('keg-type');
+
+    if (c === 'keg') {
+      if (!kt) { bad = { el: el('keg-type'), msg: `請選擇${label}KEG 類型（啤酒頭／啤酒肚／太空桶）` }; return; }
+      if (!v('keg-size')) { bad = { el: el('keg-size'), msg: `請選擇${label}KEG 容量（10L／20L／30L）` }; return; }
+    }
+    const kegNeedsNums = c === 'keg' && (kt === '啤酒頭' || kt === '啤酒肚');
+    const defect = kegNeedsNums ? '' : v('defect');
+    if (!kegNeedsNums && !defect) {
+      bad = { el: el('defect'), msg: `請選擇${label}「瑕疵 / NG / 破損」：有或無` };
+      return;
+    }
+    if (defect === '有' && !v('defect-qty')) {
+      bad = { el: el('defect-qty'), msg: `請輸入${label}瑕疵 / 破損的數量` };
+      return;
+    }
+
+    let container = '';
+    let kegNums = [];
+    if (c === 'bottle') container = `玻璃瓶（${v('bottle-color')}・${v('bottle-size') || '330mL'}）`;
+    else if (c === 'can') container = `鋁罐（${v('can-size')}）`;
+    else if (c === 'keg') {
+      container = `KEG（${kt}・${v('keg-size')}）`;
+      if (kegNeedsNums) {
+        kegNums = kegMap[idx] || [];
+        const q = parseInt(v('qty'), 10);
+        if (isNaN(q) || q !== kegNums.length) {
+          warns.push(`${tag}數量填 ${isNaN(q) ? '（未填）' : q}，但輸入了 ${kegNums.length} 個 KEG 編號`);
+        }
+        const pending = v('keg-input');
+        if (pending) warns.push(`${tag}編號欄還有「${pending}」尚未按「新增」`);
+      }
+    }
+    const dType = v('defect-type');
+    results.push({
+      name: v('name'), batch: v('batch'), qty: v('qty'), unit: v('unit'),
+      partial: v('partial') === 'yes' && v('partial-qty') ? `${v('partial-qty')} ${v('partial-unit')}`.trim() : '',
+      container,
+      kegNums,
+      defect: defect === '有' ? `${dType} ${v('defect-qty')} ${DEFECT_UNIT[dType] || ''}`.trim() : ''
+    });
+  });
+  if (bad) {
+    bad.el.classList.add('err');
+    bad.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    alert(bad.msg);
+    return null;
+  }
+  if (warns.length) {
+    const ok = confirm('⚠️ KEG 數量與編號不一致：\n' + warns.join('\n') + '\n\n按「確定」仍要產生文本\n按「取消」回去修改');
+    if (!ok) return null;
+  }
+  results.forEach(it => { if (it.name) addHint('in','item', it.name); if (it.batch) addHint('in','batch', it.batch); });
+  return results;
 }
 
 // ── Clear ──
@@ -375,8 +520,8 @@ function clearForm(prefix) {
     if (c) { c.innerHTML = ''; itemCounters[prefix] = 0; addItem(prefix); }
   }
   if (prefix === 'in') {
-    ['bottle-options','can-options','keg-options','partial-options'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
-    kegNumbers = []; renderKegList();
+    const c = document.getElementById('in-items-container');
+    if (c) { c.innerHTML = ''; itemCounters.in = 0; Object.keys(kegMap).forEach(k => delete kegMap[k]); addInItem(); }
   }
   const outKey = { r:'out-receive', ret:'out-return', in:'out-instock', out:'out-outstock' };
   const copyKey = { r:'copy-receive', ret:'copy-return', in:'copy-instock', out:'copy-outstock' };
@@ -437,22 +582,24 @@ function generate(type) {
       `\n${sep}`;
 
   } else if (type === 'instock') {
-    addHint('in','item', g('in-item'));
-    addHint('in','batch', g('in-batch'));
-    const container = getContainerText();
-    const partial = document.getElementById('partial-type').value === 'yes';
-    const partialQty = g('partial-qty');
-    const partialUnit = g('partial-unit');
-    const qty = g('in-qty');
+    const items = getInItems();
+    if (items === null) return;
+    const itemsText = items.map((it, i) => {
+      const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
+      return prefix +
+        line('\n品　　名：', it.name) +
+        line('\n批　　號：', it.batch) +
+        (it.qty ? `\n入庫數量：${it.qty} ${it.unit}` : '') +
+        line('\n未滿箱　：', it.partial) +
+        line('\n容　　器：', it.container) +
+        line('\nKEG編號：', it.kegNums.join('、')) +
+        line('\n瑕疵破損：', it.defect);
+    }).join('');
     text = `【入庫回報】\n${sep}` +
       `\n日期時間：${fmtDate(g('in-date'))}` +
       line('\n操作人員：', g('in-name')) +
       line('\n樓　　層：', g('in-floor')) +
-      line('\n品　　名：', g('in-item')) +
-      line('\n批　　號：', g('in-batch')) +
-      (qty ? `\n入庫數量：${qty} ${g('in-unit')}` : '') +
-      (partial && partialQty ? `\n未　滿　箱：${partialQty} ${partialUnit}` : '') +
-      (container ? `\n容　　器：${container}` : '') +
+      itemsText +
       `\n${sep}`;
 
   } else if (type === 'outstock') {
@@ -505,6 +652,7 @@ loadName();
 addItem('r');
 addItem('ret');
 addItem('out');
+addInItem();
 renderAllHints();
 </script>
 </body>
