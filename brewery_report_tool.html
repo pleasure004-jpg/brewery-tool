@@ -63,9 +63,6 @@ input:focus, select:focus { outline: none; border-color: #999; }
       <div class="field"><label>操作人員</label><input id="r-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="r-date" type="datetime-local" /></div>
     </div>
-    <div class="field"><label>樓層</label>
-      <select id="r-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-    </div>
     <div id="r-items-container"></div>
     <button class="add-item-btn" onclick="addItem('r')">＋ 新增品項</button>
     <div class="field"><label>用途</label>
@@ -84,9 +81,6 @@ input:focus, select:focus { outline: none; border-color: #999; }
       <div class="field"><label>操作人員</label><input id="ret-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="ret-date" type="datetime-local" /></div>
     </div>
-    <div class="field"><label>樓層</label>
-      <select id="ret-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-    </div>
     <div id="ret-items-container"></div>
     <button class="add-item-btn" onclick="addItem('ret')">＋ 新增品項</button>
     <div class="field"><label>備註</label><input id="ret-note" placeholder="選填" /></div>
@@ -102,9 +96,6 @@ input:focus, select:focus { outline: none; border-color: #999; }
       <div class="field"><label>操作人員</label><input id="in-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="in-date" type="datetime-local" /></div>
     </div>
-    <div class="field"><label>樓層</label>
-      <select id="in-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
-    </div>
     <div id="in-items-container"></div>
     <button class="add-item-btn" onclick="addInItem()">＋ 新增品項</button>
     <button class="btn btn-primary" onclick="generate('instock')">產生文本</button>
@@ -118,9 +109,6 @@ input:focus, select:focus { outline: none; border-color: #999; }
     <div class="row2">
       <div class="field"><label>操作人員</label><input id="out-name" placeholder="姓名" oninput="saveName(this.value)" /></div>
       <div class="field"><label>日期時間</label><input id="out-date" type="datetime-local" /></div>
-    </div>
-    <div class="field"><label>樓層</label>
-      <select id="out-floor"><option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select>
     </div>
     <div id="out-items-container"></div>
     <button class="add-item-btn" onclick="addItem('out')">＋ 新增品項</button>
@@ -181,6 +169,28 @@ function renderAllHints() {
 // ── Multi-item blocks ──
 const itemCounters = { r: 0, ret: 0, out: 0, in: 0 };
 
+// ── 樓層（每個品項各自選擇；新增品項預設沿用上一個品項） ──
+const FLOOR_OPTIONS = '<option value="">選擇樓層</option><option>B3</option><option>B2</option><option>B1</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option>';
+function prevFloorOf(containerId) {
+  const blocks = document.querySelectorAll(`#${containerId} .item-block`);
+  if (!blocks.length) return '';
+  return blocks[blocks.length - 1].querySelector('select[id$="-floor"]')?.value || '';
+}
+// 全部同樓層：樓層只寫一次在最上面；不同樓層：樓層寫在各品項裡面（同樓層的品項排在一起）
+function buildItemsText(items, render) {
+  const mixed = new Set(items.map(it => it.floor || '')).size > 1;
+  if (!mixed) {
+    return line('\n樓　　層：', items[0]?.floor || '') +
+      items.map((it, i) => (items.length > 1 ? `\n【品項${i+1}】` : '') + render(it)).join('');
+  }
+  const order = [], map = {};
+  items.forEach(it => { const f = it.floor || ''; if (!(f in map)) { map[f] = []; order.push(f); } map[f].push(it); });
+  let n = 0;
+  return order.map(f =>
+    map[f].map(it => { n++; return `\n【品項${n}】` + line('\n樓　　層：', f) + render(it); }).join('')
+  ).join('');
+}
+
 function addItem(prefix) {
   itemCounters[prefix]++;
   const idx = itemCounters[prefix];
@@ -196,6 +206,9 @@ function addItem(prefix) {
       <span class="item-label">品項 ${idx}</span>
       ${idx > 1 ? `<button class="remove-item-btn" onclick="removeItem('${prefix}',${idx})">移除</button>` : ''}
     </div>
+    <div class="field"><label>樓層</label>
+      <select id="${prefix}-item-${idx}-floor">${FLOOR_OPTIONS}</select>
+    </div>
     <div class="field"><label>品名 / 品項</label>
       <input id="${prefix}-item-${idx}-name" placeholder="例：原麥汁、酒花..." />
       <div class="hint-list" id="hint-${prefix}-item-${idx}-name"></div>
@@ -205,10 +218,12 @@ function addItem(prefix) {
       <div class="hint-list" id="hint-${prefix}-item-${idx}-batch"></div>
     </div>
     <div class="row2">
-      <div class="field"><label>${qtyLabel}</label><input id="${prefix}-item-${idx}-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+      <div class="field"><label>${qtyLabel}</label><input id="${prefix}-item-${idx}-qty" inputmode="decimal" placeholder="0" /></div>
       <div class="field"><label>單位</label><input id="${prefix}-item-${idx}-unit" placeholder="例：kg、L、包" /></div>
     </div>`;
+  const prevFloor = prevFloorOf(`${prefix}-items-container`);
   container.appendChild(block);
+  if (prevFloor) document.getElementById(`${prefix}-item-${idx}-floor`).value = prevFloor;
 
   // render hints for new block
   // Share item/batch hints between receive and return
@@ -237,7 +252,8 @@ function getItems(prefix) {
     const batch = document.getElementById(`${prefix}-item-${idx}-batch`)?.value.trim() || '';
     const qty = document.getElementById(`${prefix}-item-${idx}-qty`)?.value.trim() || '';
     const unit = document.getElementById(`${prefix}-item-${idx}-unit`)?.value.trim() || '';
-    if (name || batch || qty) results.push({ name, batch, qty, unit });
+    const floor = document.getElementById(`${prefix}-item-${idx}-floor`)?.value || '';
+    if (name || batch || qty) results.push({ name, batch, qty, unit, floor });
     // save hints
     if (name) { addHint(prefix, 'item', name); if (prefix === 'r') addHint('ret', 'item', name); if (prefix === 'ret') addHint('r', 'item', name); }
     if (batch) { addHint(prefix, 'batch', batch); if (prefix === 'r') addHint('ret', 'batch', batch); if (prefix === 'ret') addHint('r', 'batch', batch); }
@@ -273,8 +289,8 @@ function prefillReturn() {
     const du = document.getElementById('ret-item-1-unit');
     if (su && du) du.value = su.value;
   }
-  const sf = document.getElementById('r-floor');
-  const df = document.getElementById('ret-floor');
+  const sf = document.getElementById('r-item-1-floor');
+  const df = document.getElementById('ret-item-1-floor');
   if (sf && df && sf.value && !df.value) df.value = sf.value;
 }
 
@@ -304,6 +320,9 @@ function addInItem() {
       <span class="item-label">品項 ${idx}</span>
       ${idx > 1 ? `<button class="remove-item-btn" onclick="removeInItem(${idx})">移除</button>` : ''}
     </div>
+    <div class="field"><label>樓層</label>
+      <select id="${p}-floor">${FLOOR_OPTIONS}</select>
+    </div>
     <div class="field"><label>品名 / 品項</label>
       <input id="${p}-name" placeholder="例：IPA" />
       <div class="hint-list" id="hint-${p}-name"></div>
@@ -313,7 +332,7 @@ function addInItem() {
       <div class="hint-list" id="hint-${p}-batch"></div>
     </div>
     <div class="row2">
-      <div class="field"><label>數量</label><input id="${p}-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
+      <div class="field"><label>數量</label><input id="${p}-qty" inputmode="decimal" placeholder="0" /></div>
       <div class="field"><label>單位</label><input id="${p}-unit" placeholder="例：箱、瓶" /></div>
     </div>
     <div class="field"><label>未滿箱</label>
@@ -376,7 +395,9 @@ function addInItem() {
         </div>
       </div>
     </div>`;
+  const prevFloor = prevFloorOf('in-items-container');
   document.getElementById('in-items-container').appendChild(block);
+  if (prevFloor) document.getElementById(`${p}-floor`).value = prevFloor;
   setInHints(p);
 }
 
@@ -471,7 +492,7 @@ function getInItems() {
       container = `KEG（${kt}・${v('keg-size')}）`;
       if (kegNeedsNums) {
         kegNums = kegMap[idx] || [];
-        const q = parseInt(v('qty'), 10);
+        const q = parseFloat(v('qty'));
         if (isNaN(q) || q !== kegNums.length) {
           warns.push(`${tag}數量填 ${isNaN(q) ? '（未填）' : q}，但輸入了 ${kegNums.length} 個 KEG 編號`);
         }
@@ -481,7 +502,7 @@ function getInItems() {
     }
     const dType = v('defect-type');
     results.push({
-      name: v('name'), batch: v('batch'), qty: v('qty'), unit: v('unit'),
+      floor: v('floor'), name: v('name'), batch: v('batch'), qty: v('qty'), unit: v('unit'),
       partial: v('partial') === 'yes' && v('partial-qty') ? `${v('partial-qty')} ${v('partial-unit')}`.trim() : '',
       container,
       kegNums,
@@ -548,17 +569,13 @@ function generate(type) {
     addHint('r','purpose', g('r-purpose'));
     const items = getItems('r');
     const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
-      items.map((it, i) => {
-        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
-        return prefix +
-          line('\n品　　名：', it.name) +
-          line('\n批　　號：', it.batch) +
-          (it.qty ? `\n數　　量：${it.qty} ${it.unit}` : '');
-      }).join('');
+      buildItemsText(items, it =>
+        line('\n品　　名：', it.name) +
+        line('\n批　　號：', it.batch) +
+        (it.qty ? `\n數　　量：${it.qty} ${it.unit}` : ''));
     text = `【領料回報】\n${sep}` +
       `\n日期時間：${fmtDate(g('r-date'))}` +
       line('\n操作人員：', g('r-name')) +
-      line('\n樓　　層：', g('r-floor')) +
       itemsText +
       line('\n用　　途：', g('r-purpose')) +
       `\n${sep}`;
@@ -566,17 +583,13 @@ function generate(type) {
   } else if (type === 'return') {
     const items = getItems('ret');
     const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
-      items.map((it, i) => {
-        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
-        return prefix +
-          line('\n品　　名：', it.name) +
-          line('\n批　　號：', it.batch) +
-          (it.qty ? `\n歸還數量：${it.qty} ${it.unit}` : '');
-      }).join('');
+      buildItemsText(items, it =>
+        line('\n品　　名：', it.name) +
+        line('\n批　　號：', it.batch) +
+        (it.qty ? `\n歸還數量：${it.qty} ${it.unit}` : ''));
     text = `【領量歸還回報】\n${sep}` +
       `\n日期時間：${fmtDate(g('ret-date'))}` +
       line('\n操作人員：', g('ret-name')) +
-      line('\n樓　　層：', g('ret-floor')) +
       itemsText +
       line('\n備　　註：', g('ret-note')) +
       `\n${sep}`;
@@ -584,21 +597,17 @@ function generate(type) {
   } else if (type === 'instock') {
     const items = getInItems();
     if (items === null) return;
-    const itemsText = items.map((it, i) => {
-      const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
-      return prefix +
-        line('\n品　　名：', it.name) +
-        line('\n批　　號：', it.batch) +
-        (it.qty ? `\n入庫數量：${it.qty} ${it.unit}` : '') +
-        line('\n未滿箱　：', it.partial) +
-        line('\n容　　器：', it.container) +
-        line('\nKEG編號：', it.kegNums.join('、')) +
-        line('\n瑕疵破損：', it.defect);
-    }).join('');
+    const itemsText = buildItemsText(items, it =>
+      line('\n品　　名：', it.name) +
+      line('\n批　　號：', it.batch) +
+      (it.qty ? `\n入庫數量：${it.qty} ${it.unit}` : '') +
+      line('\n未滿箱　：', it.partial) +
+      line('\n容　　器：', it.container) +
+      line('\nKEG編號：', it.kegNums.join('、')) +
+      line('\n瑕疵破損：', it.defect));
     text = `【入庫回報】\n${sep}` +
       `\n日期時間：${fmtDate(g('in-date'))}` +
       line('\n操作人員：', g('in-name')) +
-      line('\n樓　　層：', g('in-floor')) +
       itemsText +
       `\n${sep}`;
 
@@ -606,17 +615,13 @@ function generate(type) {
     addHint('out','dest', g('out-dest'));
     const items = getItems('out');
     const itemsText = items.length === 0 ? '\n品　　名：（未填）' :
-      items.map((it, i) => {
-        const prefix = items.length > 1 ? `\n【品項${i+1}】` : '';
-        return prefix +
-          line('\n品　　名：', it.name) +
-          line('\n批　　號：', it.batch) +
-          (it.qty ? `\n出庫數量：${it.qty} ${it.unit}` : '');
-      }).join('');
+      buildItemsText(items, it =>
+        line('\n品　　名：', it.name) +
+        line('\n批　　號：', it.batch) +
+        (it.qty ? `\n出庫數量：${it.qty} ${it.unit}` : ''));
     text = `【出庫回報】\n${sep}` +
       `\n日期時間：${fmtDate(g('out-date'))}` +
       line('\n操作人員：', g('out-name')) +
-      line('\n樓　　層：', g('out-floor')) +
       itemsText +
       line('\n出庫對象：', g('out-dest')) +
       `\n${sep}`;
