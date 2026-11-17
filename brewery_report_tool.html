@@ -219,7 +219,9 @@ function addItem(prefix) {
     </div>
     <div class="row2">
       <div class="field"><label>${qtyLabel}</label><input id="${prefix}-item-${idx}-qty" inputmode="decimal" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="${prefix}-item-${idx}-unit" placeholder="例：kg、L、包" /></div>
+      <div class="field"><label>單位</label><input id="${prefix}-item-${idx}-unit" placeholder="例：kg、L、包" />
+        <div class="hint-list" id="hint-${prefix}-item-${idx}-unit"></div>
+      </div>
     </div>`;
   const prevFloor = prevFloorOf(`${prefix}-items-container`);
   container.appendChild(block);
@@ -234,6 +236,9 @@ function addItem(prefix) {
   const batchEl = document.getElementById(`hint-${prefix}-item-${idx}-batch`);
   if (nameEl) nameEl.innerHTML = hintArr.map(v => `<span class="hint-tag" onclick="fillHint('${prefix}-item-${idx}-name','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
   if (batchEl) batchEl.innerHTML = batchArr.map(v => `<span class="hint-tag" onclick="fillHint('${prefix}-item-${idx}-batch','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
+  const unitEl = document.getElementById(`hint-${prefix}-item-${idx}-unit`);
+  const unitArr = (ls(hintKey(itemHintPrefix,'unit')) || []);
+  if (unitEl) unitEl.innerHTML = unitArr.map(v => `<span class="hint-tag" onclick="fillHint('${prefix}-item-${idx}-unit','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
 }
 
 function removeItem(prefix, idx) {
@@ -257,6 +262,7 @@ function getItems(prefix) {
     // save hints
     if (name) { addHint(prefix, 'item', name); if (prefix === 'r') addHint('ret', 'item', name); if (prefix === 'ret') addHint('r', 'item', name); }
     if (batch) { addHint(prefix, 'batch', batch); if (prefix === 'r') addHint('ret', 'batch', batch); if (prefix === 'ret') addHint('r', 'batch', batch); }
+    if (unit) { addHint(prefix, 'unit', unit); if (prefix === 'r') addHint('ret', 'unit', unit); if (prefix === 'ret') addHint('r', 'unit', unit); }
   });
   return results;
 }
@@ -300,7 +306,7 @@ const kegMap = {};
 function inShow(id, on) { document.getElementById(id)?.classList.toggle('hidden', !on); }
 
 function setInHints(p) {
-  [['name','item'],['batch','batch']].forEach(([f, key]) => {
+  [['name','item'],['batch','batch'],['unit','unit'],['partial-unit','punit']].forEach(([f, key]) => {
     const el = document.getElementById(`hint-${p}-${f}`); if (!el) return;
     const arr = ls(hintKey('in', key)) || [];
     el.innerHTML = arr.map(v => `<span class="hint-tag" onclick="fillHint('${p}-${f}','${v.replace(/'/g,"\\'")}')">${v}</span>`).join('');
@@ -333,14 +339,18 @@ function addInItem() {
     </div>
     <div class="row2">
       <div class="field"><label>數量</label><input id="${p}-qty" inputmode="decimal" placeholder="0" /></div>
-      <div class="field"><label>單位</label><input id="${p}-unit" placeholder="例：箱、瓶" /></div>
+      <div class="field"><label>單位</label><input id="${p}-unit" placeholder="例：箱、瓶" />
+        <div class="hint-list" id="hint-${p}-unit"></div>
+      </div>
     </div>
     <div class="field"><label>未滿箱</label>
       <select id="${p}-partial" onchange="inToggle(${idx})"><option value="none">無</option><option value="yes">有</option></select>
       <div id="${p}-partial-opts" class="sub-field hidden">
         <div class="row2">
           <div class="field"><label>數量</label><input id="${p}-partial-qty" inputmode="numeric" pattern="[0-9]*" placeholder="0" /></div>
-          <div class="field"><label>單位</label><input id="${p}-partial-unit" placeholder="例：瓶、罐" /></div>
+          <div class="field"><label>單位</label><input id="${p}-partial-unit" placeholder="例：瓶、罐" />
+            <div class="hint-list" id="hint-${p}-partial-unit"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -412,6 +422,17 @@ function inToggle(idx) {
   inShow(`${p}-can-opts`, c === 'can');
   inShow(`${p}-keg-opts`, c === 'keg');
   inShow(`${p}-keg-nums`, kegNeedsNums);
+  const sz = document.getElementById(`${p}-keg-size`);
+  if (sz) {
+    const opts = kt === '啤酒頭' ? ['20L'] : ['10L', '20L', '30L'];
+    const cur = sz.value;
+    sz.innerHTML = (opts.length > 1 ? '<option value="">請選擇</option>' : '') + opts.map(o => `<option value="${o}">${o}</option>`).join('');
+    const blk = document.getElementById(p);
+    const typeChanged = blk && blk.dataset.kt !== kt;
+    if (blk) blk.dataset.kt = kt;
+    // 換類型時容量重置（避免殘留上一個類型的容量）；啤酒頭只有 20L 直接帶入
+    sz.value = opts.length === 1 ? opts[0] : (!typeChanged && opts.includes(cur) ? cur : '');
+  }
   // 啤酒頭 / 啤酒肚 免選瑕疵；其他情況（含太空桶）必選
   inShow(`${p}-defect-wrap`, !kegNeedsNums);
   const d = document.getElementById(`${p}-defect`);
@@ -504,6 +525,7 @@ function getInItems() {
     results.push({
       floor: v('floor'), name: v('name'), batch: v('batch'), qty: v('qty'), unit: v('unit'),
       partial: v('partial') === 'yes' && v('partial-qty') ? `${v('partial-qty')} ${v('partial-unit')}`.trim() : '',
+      partialUnit: v('partial') === 'yes' && v('partial-qty') ? v('partial-unit') : '',
       container,
       kegNums,
       defect: defect === '有' ? `${dType} ${v('defect-qty')} ${DEFECT_UNIT[dType] || ''}`.trim() : ''
@@ -519,7 +541,7 @@ function getInItems() {
     const ok = confirm('⚠️ KEG 數量與編號不一致：\n' + warns.join('\n') + '\n\n按「確定」仍要產生文本\n按「取消」回去修改');
     if (!ok) return null;
   }
-  results.forEach(it => { if (it.name) addHint('in','item', it.name); if (it.batch) addHint('in','batch', it.batch); });
+  results.forEach(it => { if (it.name) addHint('in','item', it.name); if (it.batch) addHint('in','batch', it.batch); if (it.unit) addHint('in','unit', it.unit); if (it.partialUnit) addHint('in','punit', it.partialUnit); });
   return results;
 }
 
